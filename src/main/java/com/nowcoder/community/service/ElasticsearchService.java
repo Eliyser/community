@@ -59,6 +59,7 @@ public class ElasticsearchService {
             @Override
             public <T> AggregatedPage<T> mapResults(SearchResponse response, Class<T> aClass, Pageable pageable) {
                 SearchHits hits = response.getHits();
+
                 if (hits.getTotalHits() <= 0) {
                     return null;
                 }

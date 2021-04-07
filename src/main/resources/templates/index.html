@@ -9,8 +9,11 @@
 <!--	<meta name="_csrf_header" th:content="${_csrf.headerName}">-->
 
 	<link rel="icon" href="https://static.nowcoder.com/images/logo_87_87.png"/>
-	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" crossorigin="anonymous">
+	<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" crossorigin="anonymous">
 	<link rel="stylesheet" th:href="@{/css/global.css}" />
+	<!-- import CSS -->
+	<!--引入链接的格式也换成了thymeleaf格式-->
+	<link rel="stylesheet" th:href="@{/element-ui/lib/theme-chalk/index.css}">
 	<title>牛客网-首页</title>
 </head>
 <body>	
@@ -54,7 +57,7 @@
 							</li>
 						</ul>
 						<!-- 搜索 -->
-						<form class="form-inline my-2 my-lg-0" method="get" th:action="@{/search}">
+						<form id="app" class="form-inline my-2 my-lg-0" method="get" th:action="@{/search}">
 							<input class="form-control mr-sm-2" type="search" aria-label="Search" name="keyword" th:value="${keyword}"/>
 							<button class="btn btn-outline-light my-2 my-sm-0" type="submit">搜索</button>
 						</form>
@@ -229,10 +232,49 @@
 		</footer>
 	</div>
 
-	<script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
+	<script src="https://s3.pstatp.com/cdn/expire-1-M/jquery/3.3.1/jquery.min.js" crossorigin="anonymous"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" crossorigin="anonymous"></script>
-	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" crossorigin="anonymous"></script>
+	<script th:src="@{/js/bootstrap.min.js}" crossorigin="anonymous"></script>
 	<script th:src="@{/js/global.js}"></script>
 	<script th:src="@{js/index.js}"></script>
 </body>
+<!--import axios-->
+<script th:src="@{/js/axios.min.js}"></script>
+<!-- import Vue before Element -->
+<script th:src="@{/js/vue.min.js}"></script>
+<!-- import JavaScript -->
+<script th:src="@{/element-ui/lib/index.js}"></script>
+<script>
+	new Vue({
+		el: '#app',
+		data: function() {
+			return {
+				visible: false,
+				state2: ''
+			}
+		},
+		methods: {
+			/*获取输入建议*/
+			querySearch(queryString,cb){
+				var list=[];
+				//调用的后台接口
+				let url = "/completion?queryString="+queryString;
+				//从后台获取对象数组
+				axios.get(url).then((response)=>{
+					//为数组中每个元素添加value字段，因为autocomplete只识别该字段
+					for(let i of response.data){
+						var item={value:i};
+						list.push(item);
+					}
+					cb(list);
+				}).catch((error)=>{console.log(error);});
+			},
+
+			//select时触发的事件方法，item为选中的选项
+			handleSelect(item){
+				console.log(item);
+			},
+		}
+	})
+</script>
 </html>
